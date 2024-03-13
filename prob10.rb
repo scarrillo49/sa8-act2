@@ -1,32 +1,30 @@
 class Quiz
-    def initialize(questions)
-      @questions = questions
+  def initialize(questions)
+    @questions = questions
+    generate_question_methods
+  end
+
+  def take
+    @questions.each do |question_data|
+      question_text, _ = question_data.split("|") 
+      send("question_#{question_text.strip}")
     end
-  
-    def take
-      @questions.each_with_index do |question_data, index|
-        question_text, answer_options = question_data.split("|")
-        answer_options = answer_options.split(",")
-  
-        define_method("question_#{index + 1}") do
-          puts question_text
-          answer_options.each_with_index do |option, option_index|
-            puts "#{option_index + 1}. #{option}"
-          end
-          gets.chomp
-        end
-  
-        user_answer = send("question_#{index + 1}")
-  
+  end
+
+  def generate_question_methods
+    @questions.each do |question_data|
+      question_text, _ = question_data.split("|")  
+      define_singleton_method("question_#{question_text.strip}") do
+        puts question_text
       end
     end
   end
-  
-  questions = [
-    "What is the capital of the Philippines?|Manila,Cebu,Davao",
-    "What is the capital of Japan?|Tokyo,Kyoto,Osaka",
-  ]
-  
-  quiz = Quiz.new(questions)
-  quiz.take
-  
+end
+
+questions = [
+  "What is the capital of the Philippines?|Manila",
+  "What is the capital of Japan?|Tokyo"
+]
+
+quiz = Quiz.new(questions)
+quiz.take
